@@ -92,7 +92,10 @@ namespace FourInLine.Game
         bool AiTurn()
         {
             //IA CLASS
-            return false;
+
+            //CHANGE VALUE 0
+            var pos = board.InsertToken(turn, 0);
+            return board.AnalyzeVictory(pos.row, pos.col);
         }
 
         /// <summary>
