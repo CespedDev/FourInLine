@@ -74,6 +74,62 @@ namespace FourInLine.Game
         }
 
         // VICTORY CONDITION
+        public bool AnalyzeVictory(int row, int col)
+        {
+            // Check if its empty
+            Token token = GetPosValue(row, col);
+            if (token == Token.Empty) return false;
+
+            // Check horizontal
+            int count = 0;
+            for (int i = Math.Clamp(col - 3, 0, cols - 1); i < col + 4 && i < cols; ++i)
+            {
+                if (GetPosValue(row, i) == token)
+                    ++count;
+                else
+                    count = 0;
+
+                if (count >= 4) return true;
+            }
+
+            // Check vertical
+            count = 0;
+            for (int i = Math.Clamp(row - 3, 0, rows -1); i < row + 4 && i < rows; ++i)
+            {
+                if (GetPosValue(i, col) == token)
+                    count++;
+                else
+                    count = 0;
+
+                if (count >= 4) return true;
+            }
+
+            // Check diagonal left-down to right-up
+            count = 0;
+            for (int r = row - Math.Min(row, col), c = col - Math.Min(row, col); r < rows && c < cols; r++, c++)
+            {
+                if (GetPosValue(r, c) == token)
+                    count++;
+                else
+                    count = 0;
+
+                if (count >= 4) return true;
+            }
+
+            // Check diagonal left-up to right-down
+            count = 0;
+            for (int r = row + Math.Min(rows - row - 1, col), c = col - Math.Min(rows - row - 1, col); r >= 0 && c < cols; r--, c++)
+            {
+                if (GetPosValue(r, c) == token)
+                    count++;
+                else
+                    count = 0;
+
+                if (count >= 4) return true;
+            }
+
+            return false;
+        }
 
 
         /// <summary>
@@ -97,7 +153,7 @@ namespace FourInLine.Game
         {
             for (int _row = rows - 1; _row >= 0; --_row)
             {
-                Console.Write("|");
+                Console.Write($"{_row}|");
 
                 for (int _col = 0; _col < cols; ++_col)
                 {
@@ -108,6 +164,13 @@ namespace FourInLine.Game
                 }
 
                 Console.WriteLine();
+            }
+
+            Console.Write("  ");
+
+            for (int _col = 0; _col < cols; ++_col)
+            {
+                Console.Write($"{_col} ");
             }
 
             Console.WriteLine();
