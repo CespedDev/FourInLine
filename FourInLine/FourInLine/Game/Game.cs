@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
+using FourInLine.AI;
 
 namespace FourInLine.Game
 {
@@ -12,11 +14,35 @@ namespace FourInLine.Game
         Token turn;
         bool  end;
 
+        IAI? ai1;
+        IAI? ai2;
+
         public Game()
         {
             board = new Board();
             turn  = (Token)1;
             end   = false;
+
+            GameLoop();
+        }
+
+        public Game(IAI ai)
+        {
+            board = new Board();
+            turn = (Token)1;
+            end = false;
+            this.ai1 = ai;
+
+            GameLoop();
+        }
+
+        public Game(IAI ai1, IAI ai2)
+        {
+            board = new Board();
+            turn = (Token)1;
+            end = false;
+            this.ai1 = ai1;
+            this.ai2 = ai2;
 
             GameLoop();
         }
@@ -43,11 +69,19 @@ namespace FourInLine.Game
                 switch (turn)
                 {
                     case Token.x:
-                        end = PlayerTurn();
+                        if (ai1 == null)
+                            end = PlayerTurn();
+                        else
+                            end = AiTurn(ai1);
+
                         break;
 
                     case Token.o:
-                        end = PlayerTurn();
+                        if (ai2 == null)
+                            end = PlayerTurn();
+                        else
+                            end = AiTurn(ai2);
+
                         break;
                 }
 
@@ -57,7 +91,6 @@ namespace FourInLine.Game
                 if (!end)
                 {
                     NextTokenTurn();
-
                 }
                 else
                 {
@@ -89,12 +122,9 @@ namespace FourInLine.Game
         /// Called when you want an AI take a decision.
         /// </summary>
         /// <returns>True if AI wins</returns>
-        bool AiTurn()
+        bool AiTurn(IAI ai)
         {
-            //IA CLASS
-
-            //CHANGE VALUE 0
-            var pos = board.InsertToken(turn, 0);
+            var pos = board.InsertToken(turn, ai.MakeDecision());
             return board.AnalyzeVictory(pos.row, pos.col);
         }
 

@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace FourInLine.AI
 {
-    public class NegaScout : IAI
+    public interface IAI
     {
-        public int MakeDecision()
-        {
-            throw new NotImplementedException();
-        }
+        public int MakeDecision();
     }
 }
