@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FourInLine.Game;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace FourInLine.AI
 {
     public interface IAI
     {
-        public int MakeDecision();
+        public int MakeDecision(Board board);
     }
 }

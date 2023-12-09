@@ -11,7 +11,6 @@ namespace FourInLine.Game
     internal class Game
     {
         Board board;
-        Token turn;
         bool  end;
 
         IAI? ai1;
@@ -20,7 +19,6 @@ namespace FourInLine.Game
         public Game()
         {
             board = new Board();
-            turn  = (Token)1;
             end   = false;
 
             GameLoop();
@@ -29,7 +27,6 @@ namespace FourInLine.Game
         public Game(IAI ai)
         {
             board = new Board();
-            turn = (Token)1;
             end = false;
             this.ai1 = ai;
 
@@ -39,7 +36,6 @@ namespace FourInLine.Game
         public Game(IAI ai1, IAI ai2)
         {
             board = new Board();
-            turn = (Token)1;
             end = false;
             this.ai1 = ai1;
             this.ai2 = ai2;
@@ -50,7 +46,6 @@ namespace FourInLine.Game
         public void StartNewGame()
         {
             board = new Board();
-            turn = (Token)1;
             end = false;
 
             GameLoop();
@@ -66,21 +61,21 @@ namespace FourInLine.Game
                 Console.Clear();
                 board.PrintBoard();
 
-                switch (turn)
+                switch (board.turn)
                 {
-                    case Token.x:
-                        if (ai1 == null)
-                            end = PlayerTurn();
-                        else
-                            end = AiTurn(ai1);
-
-                        break;
-
                     case Token.o:
                         if (ai2 == null)
                             end = PlayerTurn();
                         else
                             end = AiTurn(ai2);
+
+                        break;
+
+                    case Token.x:
+                        if (ai1 == null)
+                            end = PlayerTurn();
+                        else
+                            end = AiTurn(ai1);
 
                         break;
                 }
@@ -90,11 +85,11 @@ namespace FourInLine.Game
                 // CHANGE PLAYER
                 if (!end)
                 {
-                    NextTokenTurn();
+                    board.NextTokenTurn();
                 }
                 else
                 {
-                    Console.WriteLine($"Player {turn} has won.");
+                    Console.WriteLine($"Player {board.turn} has won.");
                     board.PrintBoard();
                 }
             } while (!end);
@@ -106,7 +101,7 @@ namespace FourInLine.Game
         /// <returns>True if player wins</returns>
         bool PlayerTurn()
         {
-            Console.Write($"Player {turn} turn. Insert token in a column: ");
+            Console.Write($"Player {board.turn} turn. Insert token in a column: ");
             int playerCol;
 
             while (!int.TryParse(Console.ReadLine(), out playerCol))
@@ -114,7 +109,7 @@ namespace FourInLine.Game
                 Console.Write("ERROR - Insert token in a column: ");
             }
 
-            var pos = board.InsertToken(turn, playerCol);
+            var pos = board.InsertToken(board.turn, playerCol);
             return board.AnalyzeVictory(pos.row, pos.col);
         }
 
@@ -124,21 +119,8 @@ namespace FourInLine.Game
         /// <returns>True if AI wins</returns>
         bool AiTurn(IAI ai)
         {
-            var pos = board.InsertToken(turn, ai.MakeDecision());
+            var pos = board.InsertToken(board.turn, ai.MakeDecision(board));
             return board.AnalyzeVictory(pos.row, pos.col);
-        }
-
-        /// <summary>
-        /// Change the turn to the next Token.
-        /// </summary>
-        void NextTokenTurn()
-        {
-            int valuesCount = Enum.GetNames(typeof(Token)).Length;
-            int nextToken = (int)turn + 1;
-
-            if(nextToken >= valuesCount) nextToken = 1;
-
-            turn = (Token)nextToken;
         }
     }
 }

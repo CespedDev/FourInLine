@@ -1,10 +1,12 @@
-﻿namespace FourInLine.Game
+﻿using FourInLine.AI;
+
+namespace FourInLine.Game
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            Game game = new Game();         
+            Game game = new Game(new NegaScout());
         }
     }
 }
