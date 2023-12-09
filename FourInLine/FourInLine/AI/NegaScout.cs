@@ -10,15 +10,40 @@ namespace FourInLine.AI
     public class NegaScout : IAI
     {
         int depth = 3;
-        int alpha;
-        int beta;
 
         public int MakeDecision(Board board)
         {
-            alpha = int.MinValue;
-            beta  = int.MaxValue;
+            int alpha = int.MinValue;
+            int beta = int.MaxValue;
+            int bestColumn = -1; // Initialize with an invalid column
 
-            return NegaScoutAB(new Board(board), depth, alpha, beta);
+            // Initialize bestScore to a very low value
+            int bestScore = int.MinValue;
+
+            foreach (int col in board.PosiblesInserts())
+            {
+                Board newBoard = new Board(board, col);
+
+                // Recurse.
+                int recursedScore = -NegaScoutAB(new Board(newBoard), depth, -beta, -alpha);
+                int currentScore = -recursedScore;
+
+                // Update the best score and column.
+                if (currentScore > bestScore)
+                {
+                    bestScore = currentScore;
+                    bestColumn = col;
+                }
+
+                // Update the alpha value.
+                alpha = Math.Max(alpha, bestScore);
+
+                // Check for pruning.
+                if (alpha >= beta)
+                    break;
+            }
+
+            return bestColumn;
         }
 
         private int NegaScoutAB(Board board, int maxDepth, int alpha, int beta, int currentDepth = 0)
@@ -74,4 +99,5 @@ namespace FourInLine.AI
             return bestScore;
         }
     }
+
 }

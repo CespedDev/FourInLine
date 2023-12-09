@@ -23,7 +23,7 @@ namespace FourInLine.Game
         public int rows { get; private set; }
         public int cols { get; private set; }
 
-        public Board(int rows = 6, int cols = 7)
+        public Board(int rows = 5, int cols = 7)
         {
             this.rows = rows;
             this.cols = cols;

@@ -83,7 +83,13 @@ namespace FourInLine.Game
                 Console.Clear();
 
                 // CHANGE PLAYER
-                if (!end)
+                if (board.IsGameOver())
+                {
+                    Console.WriteLine($"There is no more space.");
+                    board.PrintBoard();
+                    end = true;
+                }
+                else if (!end)
                 {
                     board.NextTokenTurn();
                 }
