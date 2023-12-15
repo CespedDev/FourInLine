@@ -6,7 +6,9 @@ namespace FourInLine.Game
     {
         static void Main(string[] args)
         {
-            Game game = new Game(new NegaScout());
+            //Game game = new Game(new NegaScout());
+
+            Game game = new Game(new NegamaxAB());
         }
     }
 }
