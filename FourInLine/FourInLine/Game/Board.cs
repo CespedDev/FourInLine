@@ -15,9 +15,10 @@ namespace FourInLine.Game
         x       = 2,
     }
 
-    internal class Board
+    public class Board
     {
         private Token[,] board;
+        public Token turn { get; private set; }
 
         public int rows { get; private set; }
         public int cols { get; private set; }
@@ -29,8 +30,30 @@ namespace FourInLine.Game
 
             board = new Token[rows,cols];
             CleanBoard();
+
+            turn = (Token)1;
         }
 
+        public Board(Board board) 
+        {
+            this.board = (Token[,]) board.board.Clone();
+            this.rows  = board.rows;
+            this.cols  = board.cols;
+            this.turn  = board.turn;
+        }
+
+        public Board(Board board, int colInsert)
+        {
+            this.board = (Token[,])board.board.Clone();
+            this.rows  = board.rows;
+            this.cols  = board.cols;
+            this.turn  = board.turn;
+
+            InsertToken(turn, colInsert);
+            NextTokenTurn();
+        }
+
+        /*
         /// <summary>
         /// Get board position value by ref.
         /// </summary>
@@ -38,6 +61,7 @@ namespace FourInLine.Game
         {
             return ref board[row, col];
         }
+        */
 
         /// <summary>
         /// Get board position value.
@@ -46,7 +70,7 @@ namespace FourInLine.Game
         {
             return board[row, col];
         }
-
+        
         /// <summary>
         /// Simulate the action of insert one token.
         /// </summary>
@@ -175,5 +199,98 @@ namespace FourInLine.Game
 
             Console.WriteLine();
         }
+
+        public void NextTokenTurn()
+        {
+            int valuesCount = Enum.GetNames(typeof(Token)).Length;
+            int nextToken = (int)turn + 1;
+
+            if (nextToken >= valuesCount) nextToken = 1;
+
+            turn = (Token)nextToken;
+        }
+
+        #region Evaluate functions
+        public int Evaluate()
+        {
+            int score = 0;
+
+            //Evaluate each direction (horizontal, vertical, diagonal)
+            score += EvaluateDirection(1, 0);   // Horizontal
+            score += EvaluateDirection(0, 1);   // Vertical
+            score += EvaluateDirection(1, 1);   // Diagonal  \
+            score += EvaluateDirection(1, -1);  // Diagonal  /
+            return score;
+        }
+
+        private int EvaluateDirection(int rowIncrement, int colIncrement) 
+        {
+            int score = 0;
+            for(int row = 0; row < rows; row ++)
+            {
+                for(int col = 0; col < cols; col++)
+                {
+                    Token token = GetPosValue(row, col);
+
+                    if(token != Token.Empty)
+                    {
+                        //Check for a sequence of four tokens in the current direction
+                        int count = 0;
+                        int r = row;
+                        int c = col;
+
+                        for(int i= 0; i < 4; i++)
+                        {
+                            if(r>=0 && r<rows && c>=0&& c < cols && GetPosValue(r,c) == token)
+                            {
+                                count++;
+                                r += rowIncrement;
+                                c += colIncrement;
+
+                            }
+                        }
+
+                        //Assign scores based on the count of tokens in a row
+                        if (count == 4)
+                            score += 10000; //Winning move
+                        else if (count == 3)
+                            score += 100;   //Potencial winnig move
+                        else if (count == 2)
+                            score += 10;    //Open row with two tokens
+                        else if (count == 1)
+                            score += 1;     //Open row with one token
+                    }
+                }
+            }
+
+            return score;
+        }
+
+        public bool IsGameOver()
+        {
+            for (int row = rows - 1; row >= 0; --row)
+            {
+                for(int col = cols - 1; col >= 0; --col)
+                {
+                    if (board[row, col] == Token.Empty) return false;
+                }
+
+            }
+            return true;
+        }
+
+        public Queue<int> PosiblesInsert()
+        {
+            Queue<int> colInserts = new Queue<int> ();
+            for(int col = 0; col < cols; ++col)
+            {
+                if(GetPosValue(rows-1,col) == Token.Empty)
+                    colInserts.Enqueue(col);
+            }
+            return colInserts;
+
+        }
+
+        #endregion
     }
 }

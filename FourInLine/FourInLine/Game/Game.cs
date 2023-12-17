@@ -1,30 +1,50 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.NetworkInformation;
+using FourInLine.AI;
 
 namespace FourInLine.Game
 {
     internal class Game
     {
         Board board;
-        Token turn;
         bool  end;
+
+        IAI? ai1;
+        IAI? ai2;
 
         public Game()
         {
             board = new Board();
-            turn  = (Token)1;
             end   = false;
 
+            GameLoop();
+        }
+
+        public Game(IAI ai)
+        {
+            board=new Board();
+            end = false;
+            this.ai1 = ai;
+
+            GameLoop();
+        }
+
+        public Game(IAI ai1, IAI ai2)
+        {
+            board = new Board();
+            end = false;
+            this.ai1 = ai1;
+            this.ai2= ai2;
             GameLoop();
         }
 
         public void StartNewGame()
         {
             board = new Board();
-            turn = (Token)1;
             end = false;
 
             GameLoop();
@@ -40,28 +60,42 @@ namespace FourInLine.Game
                 Console.Clear();
                 board.PrintBoard();
 
-                switch (turn)
+                switch (board.turn)
                 {
-                    case Token.x:
-                        end = PlayerTurn();
+                    case Token.o:
+                        if (ai2 == null)
+                            end = PlayerTurn();
+                        else
+                            end = AiTurn(ai2);
+
                         break;
 
-                    case Token.o:
-                        end = PlayerTurn();
+                    case Token.x:
+                        if (ai1 == null)
+                            end = PlayerTurn();
+                        else
+                            end = AiTurn(ai1);
+                        
                         break;
                 }
 
                 Console.Clear();
 
                 // CHANGE PLAYER
-                if (!end)
+                if (board.IsGameOver())
                 {
-                    NextTokenTurn();
-
+                    Console.WriteLine($"There is no more space.");
+                    board.PrintBoard();
+                    end = true;
                 }
-                else
+                else if (!end)
                 {
-                    Console.WriteLine($"Player {turn} has won.");
+                    board.NextTokenTurn();
+                }
+
+                else 
+                {
+                    Console.WriteLine($"Player {board.turn} has won.");
                     board.PrintBoard();
                 }
             } while (!end);
@@ -73,7 +107,7 @@ namespace FourInLine.Game
         /// <returns>True if player wins</returns>
         bool PlayerTurn()
         {
-            Console.Write($"Player {turn} turn. Insert token in a column: ");
+            Console.Write($"Player {board.turn} turn. Insert token in a column: ");
             int playerCol;
 
             while (!int.TryParse(Console.ReadLine(), out playerCol))
@@ -81,7 +115,7 @@ namespace FourInLine.Game
                 Console.Write("ERROR - Insert token in a column: ");
             }
 
-            var pos = board.InsertToken(turn, playerCol);
+            var pos = board.InsertToken(board.turn, playerCol);
             return board.AnalyzeVictory(pos.row, pos.col);
         }
 
@@ -89,15 +123,15 @@ namespace FourInLine.Game
         /// Called when you want an AI take a decision.
         /// </summary>
         /// <returns>True if AI wins</returns>
-        bool AiTurn()
+        bool AiTurn(IAI ai)
         {
             //IA CLASS
 
             //CHANGE VALUE 0
-            var pos = board.InsertToken(turn, 0);
+            var pos = board.InsertToken(board.turn, 0);
             return board.AnalyzeVictory(pos.row, pos.col);
         }
-
+        /*
         /// <summary>
         /// Change the turn to the next Token.
         /// </summary>
@@ -110,5 +144,6 @@ namespace FourInLine.Game
 
             turn = (Token)nextToken;
         }
+        */
     }
 }
