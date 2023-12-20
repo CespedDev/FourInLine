@@ -1,4 +1,4 @@
-﻿ using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -128,7 +128,7 @@ namespace FourInLine.Game
             //IA CLASS
 
             //CHANGE VALUE 0
-            var pos = board.InsertToken(board.turn, 0);
+            var pos = board.InsertToken(board.turn, ai.MakeDecision(board));
             return board.AnalyzeVictory(pos.row, pos.col);
         }
         /*
