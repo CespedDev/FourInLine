@@ -46,7 +46,7 @@ namespace FourInLine.AI
             return bestColumn;
         }
 
-        private int NegamaxABInternal(Board board, int maxDepth, int alpha, int beta, int currentDepth = 0)
+        public int NegamaxABInternal(Board board, int maxDepth, int alpha, int beta, int currentDepth = 0)
         {
             // Comprobar si hemos terminado la recursión.
             if (board.IsGameOver() || currentDepth == maxDepth)
