@@ -27,11 +27,11 @@ namespace FourInLine.Game
                 case "1":
                     if (fullAI)
                     {
-                        game = new Game();
+                        game = new Game(new SimpleNegamax(), new SimpleNegamax());
                     }
                     else
                     {
-                        game = new Game();
+                        game = new Game(new SimpleNegamax());
                     }
                     break;
 
