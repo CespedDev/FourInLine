@@ -9,7 +9,7 @@ namespace FourInLine.Game
             //Game game = new Game(new NegaScout());
 
             //Game game = new Game(new NegamaxAB());
-            Game game = new Game(new MTDf(3));
+            Game game = new Game(new AspirationSearch());
         }
     }
 }

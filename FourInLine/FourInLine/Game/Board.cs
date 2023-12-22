@@ -226,7 +226,21 @@ namespace FourInLine.Game
 
             return score;
         }
+        public long GetHash()
+        {
+            long hash = 17; // Valor inicial arbitrario
+            const int prime = 23; // Constante para combinar el hash
 
+            for (int row = 0; row < rows; ++row)
+            {
+                for (int col = 0; col < cols; ++col)
+                {
+                    hash = hash * prime + (int)board[row, col];
+                }
+            }
+
+            return hash;
+        }
         private int EvaluateDirection(int rowIncrement, int colIncrement)
         {
             int score = 0;
