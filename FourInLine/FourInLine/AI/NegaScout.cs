@@ -46,7 +46,7 @@ namespace FourInLine.AI
             return bestColumn;
         }
 
-        private int NegaScoutAB(Board board, int maxDepth, int alpha, int beta, int currentDepth = 0)
+        private int NegaScoutAB(Board board, int maxDepth, int alpha, int beta, int currentDepth = 1)
         {
             // Check if we're done recursing.
             if (board.IsGameOver() || currentDepth == maxDepth)
@@ -66,7 +66,7 @@ namespace FourInLine.AI
                 Board newBoard = new Board(board, col);
 
                 // Recurse.
-                int recursedScore = -NegaScoutAB(new Board(newBoard), maxDepth, -adaptiveBeta, -Math.Max(alpha, bestScore), currentDepth + 1);
+                int recursedScore = NegamaxABInternal(new Board(newBoard), maxDepth, -adaptiveBeta, -Math.Max(alpha, bestScore), currentDepth + 1);
                 int currentScore = -recursedScore;
 
                 // Update the best score.
@@ -81,7 +81,7 @@ namespace FourInLine.AI
                     // Otherwise, we can do a Test.
                     else
                     {
-                        int negativeBestScore = -NegaScoutAB(new Board(newBoard), maxDepth, -beta, -currentScore, currentDepth);
+                        int negativeBestScore = NegaScoutAB(new Board(newBoard), maxDepth, -beta, -currentScore, currentDepth);
                         bestScore = -negativeBestScore;
                     }
 
@@ -98,6 +98,39 @@ namespace FourInLine.AI
 
             return bestScore;
         }
+
+        private int NegamaxABInternal(Board board, int maxDepth, int alpha, int beta, int currentDepth = 0)
+        {
+            if (board.IsGameOver() || currentDepth == maxDepth)
+            {
+                return board.Evaluate();
+            }
+
+            int bestScore = int.MinValue;
+
+            foreach (int col in board.PosiblesInserts())
+            {
+                Board newBoard = new Board(board, col);
+                int recursedScore = -NegamaxABInternal(newBoard, maxDepth, -beta, -alpha, currentDepth + 1);
+                int currentScore = -recursedScore;
+
+                if (currentScore > bestScore)
+                {
+                    bestScore = currentScore;
+                }
+
+                alpha = Math.Max(alpha, bestScore);
+                beta = Math.Min(beta, bestScore);  // Añade esta línea
+
+                if (alpha >= beta)
+                {
+                    break;
+                }
+            }
+
+            return bestScore;
+        }
+
     }
 
 }
