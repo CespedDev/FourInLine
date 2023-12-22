@@ -1,15 +1,18 @@
 ﻿using FourInLine.Game;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace FourInLine.AI
 {
     public class NegaScout : IAI
     {
         int depth = 3;
+        int nodeNums = 0;
 
         public int MakeDecision(Board board)
         {
@@ -25,9 +28,11 @@ namespace FourInLine.AI
                 Board newBoard = new Board(board, col);
 
                 // Recurse.
-                int recursedScore = -NegaScoutAB(new Board(newBoard), depth, -beta, -alpha);
+                int recursedScore = NegaScoutAB(new Board(newBoard), depth, -beta, -alpha);
                 int currentScore = -recursedScore;
 
+                Debug.WriteLine($"NODO profundidad: {1} score: {currentScore}");
+                nodeNums++;
                 // Update the best score and column.
                 if (currentScore > bestScore)
                 {
@@ -46,11 +51,13 @@ namespace FourInLine.AI
             return bestColumn;
         }
 
-        private int NegaScoutAB(Board board, int maxDepth, int alpha, int beta, int currentDepth = 1)
+        private int NegaScoutAB(Board board, int maxDepth, int alpha, int beta, int currentDepth = 2)
         {
             // Check if we're done recursing.
             if (board.IsGameOver() || currentDepth == maxDepth)
             {
+                int score = board.Evaluate();
+                Debug.WriteLine($"NODO profundidad: {currentDepth} score: {score}");
                 return board.Evaluate(); // Assuming Evaluate returns an integer.
             }
 
@@ -68,6 +75,9 @@ namespace FourInLine.AI
                 // Recurse.
                 int recursedScore = NegamaxABInternal(new Board(newBoard), maxDepth, -adaptiveBeta, -Math.Max(alpha, bestScore), currentDepth + 1);
                 int currentScore = -recursedScore;
+
+                Debug.WriteLine($"NODO profundidad: {currentDepth} score: {currentScore}");
+                nodeNums++;
 
                 // Update the best score.
                 if (currentScore > bestScore)

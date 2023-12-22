@@ -53,16 +53,6 @@ namespace FourInLine.Game
             NextTokenTurn();
         }
 
-        /*
-        /// <summary>
-        /// Get board position value by ref.
-        /// </summary>
-        public ref Token GetPos(int row, int col)
-        {
-            return ref board[row, col];
-        }
-        */
-
         /// <summary>
         /// Get board position value.
         /// </summary>

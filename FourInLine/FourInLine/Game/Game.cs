@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -15,6 +16,8 @@ namespace FourInLine.Game
 
         IAI? ai1;
         IAI? ai2;
+
+        Stopwatch stopwatch = new Stopwatch();
 
         public Game()
         {
@@ -64,18 +67,18 @@ namespace FourInLine.Game
                 switch (board.turn)
                 {
                     case Token.o:
-                        if (ai2 == null)
-                            end = PlayerTurn();
-                        else
-                            end = AiTurn(ai2);
-
-                        break;
-
-                    case Token.x:
                         if (ai1 == null)
                             end = PlayerTurn();
                         else
                             end = AiTurn(ai1);
+
+                        break;
+
+                    case Token.x:
+                        if (ai2 == null)
+                            end = PlayerTurn();
+                        else
+                            end = AiTurn(ai2);
 
                         break;
                 }
@@ -125,7 +128,11 @@ namespace FourInLine.Game
         /// <returns>True if AI wins</returns>
         bool AiTurn(IAI ai)
         {
+            stopwatch.Start();
             var pos = board.InsertToken(board.turn, ai.MakeDecision(board));
+            stopwatch.Stop();
+            Debug.WriteLine($"Tiempo transcurrido: {stopwatch.Elapsed}");
+            stopwatch.Restart();
             return board.AnalyzeVictory(pos.row, pos.col);
         }
     }

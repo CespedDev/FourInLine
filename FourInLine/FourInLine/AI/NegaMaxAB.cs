@@ -6,12 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace FourInLine.AI
 {
     public class NegamaxAB : IAI
     {
         private int depth = 3;
+        int nodeNums = 0;
 
         public int MakeDecision(Board board)
         {
@@ -27,8 +29,11 @@ namespace FourInLine.AI
                 Board newBoard = new Board(board, col);
 
                 // Llamar al método interno NegamaxAB
-                int recursedScore = -NegamaxABInternal(newBoard, depth, -beta, -alpha);
+                int recursedScore = NegamaxABInternal(newBoard, depth, -beta, -alpha);
                 int currentScore = -recursedScore;
+
+                Debug.WriteLine($"NODO profundidad: {1} score: {currentScore}");
+                nodeNums++;
 
                 // Actualizar la mejor puntuacion y la mejor columna
                 if (currentScore > bestScore)
@@ -42,18 +47,24 @@ namespace FourInLine.AI
 
                 // Comprobar si se debe podar
                 if (alpha >= beta)
+                {
                     break;
+                }
+                    
             }
 
+            Debug.WriteLine($"NODO profundidad: {0} score: {-bestScore}");
             return bestColumn;
         }
 
-        public int NegamaxABInternal(Board board, int maxDepth, int alpha, int beta, int currentDepth = 0)
+        public int NegamaxABInternal(Board board, int maxDepth, int alpha, int beta, int currentDepth = 2)
         {
             // Comprobar si ha terminado la funcion recursiva
             if (board.IsGameOver() || currentDepth == maxDepth)
             {
-                return board.Evaluate();
+                int score = -board.Evaluate();
+                Debug.WriteLine($"NODO profundidad: {currentDepth} score: {score}");
+                return score;
             }
 
             int bestScore = int.MinValue;
@@ -62,8 +73,9 @@ namespace FourInLine.AI
             {
                 Board newBoard = new Board(board, col);
 
-                int recursedScore = -NegamaxABInternal(newBoard, maxDepth, -beta, -alpha, currentDepth + 1);
+                int recursedScore = NegamaxABInternal(newBoard, maxDepth, -beta, -alpha, currentDepth + 1);
                 int currentScore = -recursedScore;
+                nodeNums++;
 
                 if (currentScore > bestScore)
                 {
@@ -75,12 +87,13 @@ namespace FourInLine.AI
                 beta = Math.Min(beta, bestScore);
 
                 // Comprobar si se debe podar.
-                if (alpha >= beta)
+                if (beta >= alpha)
                 {
                     break;
                 }
             }
 
+            Debug.WriteLine($"NODO profundidad: {currentDepth} score: {bestScore}");
             return bestScore;
         }
     }
