@@ -214,17 +214,27 @@ namespace FourInLine.Game
         }
 
         #region Evaluate functions
+        private static int[,] evaluationTable = {
+            {3, 4,  5,  7,  5, 4, 3},
+            {4, 6,  8, 10,  8, 6, 4},
+            {5, 8, 11, 13, 11, 8, 5},
+            {5, 8, 11, 13, 11, 8, 5},
+            {4, 6,  8, 10,  8, 6, 4},
+            {3, 4,  5,  7,  5, 4, 3}};
+
         public int Evaluate()
         {
-            int score = 0;
+            int score = 128;
 
-            // Evaluate each direction (horizontal, vertical, diagonal)
-            score += EvaluateDirection(1, 0);  // Horizontal
-            score += EvaluateDirection(0, 1);  // Vertical
-            score += EvaluateDirection(1, 1);  // Diagonal \
-            score += EvaluateDirection(1, -1); // Diagonal /
+            int sum = 0;
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < cols; j++)
+                    if (GetPosValue(i, j) == turn)
+                        sum += evaluationTable[i, j];
+                    else if (GetPosValue(i, j) != turn && GetPosValue(i, j) != Token.Empty)
+                        sum -= evaluationTable[i, j];
 
-            return score;
+            return score + sum;
         }
         public long GetHash()
         {
@@ -240,48 +250,6 @@ namespace FourInLine.Game
             }
 
             return hash;
-        }
-        private int EvaluateDirection(int rowIncrement, int colIncrement)
-        {
-            int score = 0;
-
-            for (int row = 0; row < rows; row++)
-            {
-                for (int col = 0; col < cols; col++)
-                {
-                    Token token = GetPosValue(row, col);
-
-                    if (token != Token.Empty)
-                    {
-                        // Check for a sequence of four tokens in the current direction
-                        int count = 0;
-                        int r = row;
-                        int c = col;
-
-                        for (int i = 0; i < 4; i++)
-                        {
-                            if (r >= 0 && r < rows && c >= 0 && c < cols && GetPosValue(r, c) == token)
-                            {
-                                count++;
-                                r += rowIncrement;
-                                c += colIncrement;
-                            }
-                        }
-
-                        // Assign scores based on the count of tokens in a row
-                        if (count == 4)
-                            score += 10000; // Winning move
-                        else if (count == 3)
-                            score += 100;   // Potential winning move
-                        else if (count == 2)
-                            score += 10;    // Open row with two tokens
-                        else if (count == 1)
-                            score += 1;     // Open row with one token
-                    }
-                }
-            }
-
-            return score;
         }
 
         public bool IsGameOver()
